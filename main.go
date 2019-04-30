@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
+	"github.com/pierods/mgaen/encrypt"
 	"golang.org/x/crypto/ssh/terminal"
 	"os"
 	"syscall"
@@ -25,7 +26,7 @@ func main() {
 		fmt.Print("Enter clear file name/path: ")
 		consoleReader := bufio.NewScanner(os.Stdin)
 		consoleReader.Scan()
-		inFile  = consoleReader.Text()
+		inFile = consoleReader.Text()
 
 		fmt.Print("Enter encrypted file name/path: ")
 		consoleReader.Scan()
@@ -47,7 +48,8 @@ func main() {
 		fmt.Println("Creating encrypted file " + outFile)
 	}
 
-	getPassword()
+	password := getPassword()
+	encrypt.Seal([]byte{}, password)
 
 }
 
@@ -68,7 +70,7 @@ func getPassword() []byte {
 		fmt.Println(err.Error())
 		os.Exit(1)
 	}
-	if  bytes.Compare(password, passwordConfirm) != 0 {
+	if bytes.Compare(password, passwordConfirm) != 0 {
 		fmt.Println("\nPasswords don't match. Exiting")
 		os.Exit(3)
 	}
