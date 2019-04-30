@@ -35,7 +35,7 @@ func main() {
 
 	case 2:
 		inFile = os.Args[1]
-		fmt.Println("Using clear file " + inFile)
+		fmt.Println("Reading clear file " + inFile)
 
 		consoleReader := bufio.NewScanner(os.Stdin)
 		fmt.Print("Enter encrypted file name/path: ")
@@ -44,9 +44,9 @@ func main() {
 
 	case 3:
 		inFile = os.Args[1]
-		fmt.Println("Using clear file " + inFile)
+		fmt.Println("Reading clear file " + inFile)
 		outFile = os.Args[2]
-		fmt.Println("Creating encrypted file " + outFile)
+		fmt.Println("Writing to encrypted file " + outFile)
 	}
 
 	password := getPassword()
