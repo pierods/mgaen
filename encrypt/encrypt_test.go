@@ -1,6 +1,7 @@
 package encrypt
 
 import (
+	"bytes"
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/sha256"
@@ -17,10 +18,12 @@ func TestSeal(t *testing.T) {
 	if err == nil {
 		t.Fatal("Should not accept an empty password")
 	}
-	t.Log([]byte("abcdefghi"))
 	enc, err := Seal([]byte("abcdefghi"), []byte("0123456789"))
 	if err != nil {
 		t.Fatal(err)
+	}
+	if bytes.Contains(enc, []byte("abcdefghi")) {
+		t.Fatal("Should not store clear text")
 	}
 	dec := decrypt(t, enc, []byte("0123456789"))
 	if dec != "abcdefghi" {

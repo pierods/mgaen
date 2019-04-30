@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/pierods/mgaen/encrypt"
 	"golang.org/x/crypto/ssh/terminal"
+	"io/ioutil"
 	"os"
 	"syscall"
 )
@@ -49,8 +50,24 @@ func main() {
 	}
 
 	password := getPassword()
-	encrypt.Seal([]byte{}, password)
 
+	inData, err := ioutil.ReadFile(inFile)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(3)
+	}
+
+	encryptedData, err := encrypt.Seal(inData, password)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(4)
+	}
+
+	err = ioutil.WriteFile(outFile, encryptedData, 0644)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(5)
+	}
 }
 
 func getPassword() []byte {
