@@ -2,10 +2,12 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"flag"
 	"fmt"
+	"golang.org/x/crypto/ssh/terminal"
 	"os"
-	"strings"
+	"syscall"
 )
 
 var helpFlag = flag.Bool("help", false, "")
@@ -21,29 +23,55 @@ func main() {
 	switch len(os.Args) {
 	case 1:
 		fmt.Print("Enter clear file name/path: ")
-		consoleReader := bufio.NewReader(os.Stdin)
-		inFile, _ = consoleReader.ReadString('\n')
-		inFile = strings.Replace(inFile, "\n", "", -1)
+		consoleReader := bufio.NewScanner(os.Stdin)
+		consoleReader.Scan()
+		inFile  = consoleReader.Text()
 
 		fmt.Print("Enter encrypted file name/path: ")
-		outFile, _ = consoleReader.ReadString('\n')
-		outFile = strings.Replace(outFile, "\n", "", -1)
+		consoleReader.Scan()
+		outFile = consoleReader.Text()
 
 	case 2:
 		inFile = os.Args[1]
 		fmt.Println("Using clear file " + inFile)
 
-		consoleReader := bufio.NewReader(os.Stdin)
+		consoleReader := bufio.NewScanner(os.Stdin)
 		fmt.Print("Enter encrypted file name/path: ")
-		outFile, _ = consoleReader.ReadString('\n')
-		outFile = strings.Replace(outFile, "\n", "", -1)
+		consoleReader.Scan()
+		outFile = consoleReader.Text()
 
 	case 3:
 		inFile = os.Args[1]
 		fmt.Println("Using clear file " + inFile)
-
-		outFile := os.Args[2]
+		outFile = os.Args[2]
 		fmt.Println("Creating encrypted file " + outFile)
 	}
 
+	getPassword()
+
+}
+
+func getPassword() []byte {
+	fmt.Print("Enter password: ")
+	password, err := terminal.ReadPassword(int(syscall.Stdin))
+	if err != nil {
+		fmt.Println(err.Error())
+		os.Exit(1)
+	}
+	if len(password) == 0 {
+		fmt.Println("Empty password. Exiting.")
+		os.Exit(2)
+	}
+	fmt.Print("\nConfirm password: ")
+	passwordConfirm, err := terminal.ReadPassword(int(syscall.Stdin))
+	if err != nil {
+		fmt.Println(err.Error())
+		os.Exit(1)
+	}
+	if  bytes.Compare(password, passwordConfirm) != 0 {
+		fmt.Println("\nPasswords don't match. Exiting")
+		os.Exit(3)
+	}
+	fmt.Println()
+	return password
 }
